@@ -52,10 +52,11 @@ async def show_mistakes(message: Message, bot: Bot):
         # print(mistakes_answer)
     # Объединяем все строки в одну
     message_text = '\n\n'.join(mistakes_answer)
-
-    # Отправляем одно сообщение с объединенными строками
-    await message.answer(message_text)
-
+    if db.select_columns(['result'], message.from_user.id)[0] != 10:
+        # Отправляем одно сообщение с объединенными строками
+        await message.answer(message_text)
+    else:
+        await message.answer(text='У вас нет ошибок! Круто!')
 
 @router.message(F.text.lower().in_(['получить сертификат']))
 async def get_certificate(message: Message, bot: Bot):
