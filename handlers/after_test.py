@@ -58,6 +58,12 @@ async def show_mistakes(message: Message, bot: Bot):
     else:
         await message.answer(text='У вас нет ошибок! Круто!')
 
+
 @router.message(F.text.lower().in_(['получить сертификат']))
 async def get_certificate(message: Message, bot: Bot):
     await message.answer('Сертификат')
+
+
+@router.message(F.text.lower().in_(['/channel']))
+async def get_chanel(message: Message, bot: Bot):
+    await message.answer('https://t.me/PervueBelgorod')

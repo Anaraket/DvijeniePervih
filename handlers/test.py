@@ -10,6 +10,7 @@ from aiogram.filters import Command
 import os
 from utils.db import Database
 from utils.functions import send_questions, result
+from aiogram.filters import IS_MEMBER, IS_NOT_MEMBER
 
 router = Router()
 
@@ -43,15 +44,20 @@ async def command_start(message: Message, bot: Bot):
 # Хэндлер для команды /test - запуск теста
 @router.message(F.text.lower().in_(['/test', 'пройти тест', 'тест']), StateFilter(None))
 async def check_subscription(message: Message, bot: Bot, state: FSMContext):
-    user_channel_status = await bot.get_chat_member(chat_id=-1002004860176, user_id=message.from_user.id)
-    if user_channel_status.status not in ['left', 'kicked']:
+    user_channel_status = await bot.get_chat_member(chat_id=-1002062538840, user_id=message.from_user.id)
+    if user_channel_status.status in ['member', 'kicked', 'creator']:
         db = Database(os.getenv('DATABASE_NAME'))
         if not db.is_database_empty():
-            users, *rest = db.select_passed(message.from_user.id)[0]
-            db.add_passed(0, message.from_user.id)
-            if users == 1:
-                await message.answer('Вы уже проходили тест')
-            else:
+            try:
+                users, *rest = db.select_passed(message.from_user.id)[0]
+                # db.add_passed(0, message.from_user.id)
+                if users == 1:
+                    await message.answer('Вы уже проходили тест')
+                else:
+                    db.add_user(message.from_user.id, user_channel_status.status, 0)
+                    await message.answer('Желаете пройти тест?', reply_markup=kb)
+                    await state.set_state(QuestionsState.passed)
+            except:
                 db.add_user(message.from_user.id, user_channel_status.status, 0)
                 await message.answer('Желаете пройти тест?', reply_markup=kb)
                 await state.set_state(QuestionsState.passed)
@@ -60,7 +66,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
             await message.answer('Желаете пройти тест?', reply_markup=kb)
             await state.set_state(QuestionsState.passed)
     else:
-        await message.answer('Для начала подпишись на наш канал: https://t.me/+iv10xEEruWNmOWJi')
+        await message.answer('Для начала подпишись на наш канал: https://t.me/PervueBelgorod')
 
 
 # Хэндлер для начала самого теста (подтверждение от пользователя)

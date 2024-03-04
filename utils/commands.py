@@ -16,6 +16,10 @@ async def set_commands(bot: Bot):
         BotCommand(
             command='help',
             description='Помощь в работе с ботом'
+        ),
+        BotCommand(
+            command='channel',
+            description='Ссылка на канал',
         )
     ]
 
