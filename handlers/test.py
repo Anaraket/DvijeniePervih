@@ -1,24 +1,19 @@
+import os
+
 from aiogram import Router, Bot, F
+from aiogram.filters import Command
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from keyboards.start_test import kb
-from utils.states import QuestionsState
-from keyboards.test import question
-from keyboards.result import result_kb
 from aiogram.types import Message
-from aiogram.filters import Command
-import os
+
+from keyboards.result import result_kb
+from keyboards.start_test import kb
+from keyboards.test import question
 from utils.db import Database
-from utils.functions import send_questions, result
-from aiogram.filters import IS_MEMBER, IS_NOT_MEMBER
+from utils.functions import send_questions, result, request
+from utils.states import QuestionsState
 
 router = Router()
-
-
-# # Отправляет пользователю вопрос из списка
-# def send_questions(number: int):
-#     message = questions[number - 1]["question"]
-#     return message
 
 
 # Проверяет правильность введённого ФИО
@@ -26,51 +21,44 @@ def fio_correct(message: Message):
     return message.text == message.text.isalpha() or ' ' in message.text
 
 
-# def result(answers: list):
-#     score = 0
-#     user_answers = [item[4:14] for item in answers]
-#     for idx, values in enumerate(questions, start=1):
-#         if values['correct_answer'] in user_answers[0]:
-#             score += 1
-#     return score
-
-
-# Обработчик команды /start и создание ДБ
+# Обработчик команды /start
 @router.message(Command(commands=['start']))
-async def command_start(message: Message, bot: Bot):
-    await bot.send_message(chat_id=message.from_user.id, text="👋 Привет! Это бот для прохождения теста")
+async def command_start(message: Message):
+    await message.answer(text="👋 Привет! Это бот для прохождения теста")
 
 
 # Хэндлер для команды /test - запуск теста
 @router.message(F.text.lower().in_(['/test', 'пройти тест', 'тест']), StateFilter(None))
 async def check_subscription(message: Message, bot: Bot, state: FSMContext):
-    user_channel_status = await bot.get_chat_member(chat_id=-1002062538840, user_id=message.from_user.id)
-    if user_channel_status.status in ['member', 'kicked', 'creator']:
+    # Проверка, что пользователь подписан на канал
+    user_channel_status = await bot.get_chat_member(chat_id=(os.getenv('ID_CHANNEL')), user_id=message.from_user.id)
+    if user_channel_status.status in ['member', 'creator', 'administrator']:
         db = Database(os.getenv('DATABASE_NAME'))
-        if not db.is_database_empty():
-            try:
-                users, *rest = db.select_passed(message.from_user.id)[0]
-                # db.add_passed(0, message.from_user.id)
-                if users == 1:
-                    await message.answer('Вы уже проходили тест')
-                else:
-                    db.add_user(message.from_user.id, user_channel_status.status, 0)
-                    await message.answer('Желаете пройти тест?', reply_markup=kb)
-                    await state.set_state(QuestionsState.passed)
-            except:
+        print(db.select_columns(request, message.from_user.id))
+        try:
+            # Пробуем узнать проходил ли пользователь тест
+            users, *rest = db.select_passed(message.from_user.id)[0]
+            db.add_passed(0, message.from_user.id)
+            if users == 1:
+                # Если уже проходил
+                await message.answer('Вы уже проходили тест')
+            else:
+                # Если ещё не проходил тест
                 db.add_user(message.from_user.id, user_channel_status.status, 0)
                 await message.answer('Желаете пройти тест?', reply_markup=kb)
                 await state.set_state(QuestionsState.passed)
-        else:
+        except:
+            # Если не получилось достать значение passed (Если пользователя ещё нет в БД)
             db.add_user(message.from_user.id, user_channel_status.status, 0)
             await message.answer('Желаете пройти тест?', reply_markup=kb)
             await state.set_state(QuestionsState.passed)
     else:
-        await message.answer('Для начала подпишись на наш канал: https://t.me/PervueBelgorod')
+        # Если пользователь не подписан на канал
+        await message.answer(f'Для начала подпишись на наш канал: {os.getenv('LINK')}')
 
 
 # Хэндлер для начала самого теста (подтверждение от пользователя)
-@router.message(F.text.lower().in_(['да', 'хочу', 'желаю']), QuestionsState.passed)
+@router.message(QuestionsState.passed, F.text.lower().in_(['да', 'хочу', 'желаю']))
 async def pozitive_answer(message: Message, state: FSMContext):
     await message.answer(f"Замечательно!\nВведите ФИО:")
     await state.set_state(QuestionsState.fio)
@@ -88,7 +76,6 @@ async def negative_answer(message: Message, state: FSMContext):
 async def correct_fio(message: Message, state: FSMContext):
     db = Database(os.getenv('DATABASE_NAME'))
     db.add_fio(fio=message.text, user_id=message.from_user.id)
-    await state.update_data(fio=message.text)
     await message.answer('Класс! Начнём тест')
     await message.answer(text=f'<u>1-й вопрос:</u>\n\n<b>{send_questions(1)}</b>', reply_markup=await question(1))
     await state.set_state(QuestionsState.first)
@@ -198,8 +185,8 @@ async def tenth(message: Message, state: FSMContext):
     db.add_tenth(answer=message.text, user_id=message.from_user.id)
     db.add_passed(1, message.from_user.id)
     await state.clear()
-    # Ваш результат
-    db.add_result(answer=result(db.select_all_answers(message.from_user.id)), user_id=message.from_user.id)
+    # Ваш результат (result - импортированная функция для подсчёта баллов)
+    db.add_result(answer=result(db.select_columns(request, message.from_user.id)), user_id=message.from_user.id)
     await message.answer(
-        text=f'Поздравляю!\nВаш результат: {result(db.select_all_answers(message.from_user.id))}/10',
+        text=f'Поздравляю!\nВаш результат: {result(db.select_columns(request, message.from_user.id))}/10',
         reply_markup=result_kb)

@@ -1,69 +1,46 @@
 import os
 
-from aiogram import Router, F, Bot
+from aiogram import Router, F
 from aiogram.types import Message
 
-from utils.db import Database
-from utils.questions import questions
+from utils.functions import show_mistakes
 
 router = Router()
 
-request = ['user_id',
-           'status',
-           'passed',
-           'fio',
-           'first_question',
-           'second_question',
-           'third_question',
-           'fourth_question',
-           'fifth_question',
-           'sixth_question',
-           'seventh_question',
-           'eighth_question',
-           'ninth_question',
-           'tenth_question',
-           'result']
 
-
+# Хэндлер, на кнопку "посмотреть ошибки" и функция отправки сообщения с ошибками
 @router.message(F.text.lower().in_(['посмотреть ошибки']))
-async def show_mistakes(message: Message, bot: Bot):
-    db = Database(os.getenv('DATABASE_NAME'))
-    mistakes = []
-    answers = db.select_columns(column_names=request[4:-1], user_id=message.from_user.id)
-    correct_answers = [question['correct_answer'] for question in questions]
-
-    # print(mistakes)
-    # print(answers)
-    # print(correct_answers)
-    # print('--------------')
-    for index, answer in enumerate(answers):
-        if answer != correct_answers[index]:
-            mistakes.append((index + 1, answer))
-    # print(mistakes)
-    # print('**************')
-    mistakes_answer = []
-    for j in mistakes:
-        # j - кортеж (j[0] - номер вопроса, j[1] - неправильный ответ)
-        # print(j, j[0], j[1])
-        mistake_str = f'Вопрос {j[0]}: {questions[j[0] - 1]["question"]}\nВаш ответ: {j[1]}\nПравильный ответ: {correct_answers[j[0] - 1]}'
-        # print(mistake_str)
-        # print('/\/\/\/\/\/\/\/\/')
-        mistakes_answer.append(mistake_str)
-        # print(mistakes_answer)
-    # Объединяем все строки в одну
-    message_text = '\n\n'.join(mistakes_answer)
-    if db.select_columns(['result'], message.from_user.id)[0] != 10:
-        # Отправляем одно сообщение с объединенными строками
-        await message.answer(message_text)
-    else:
-        await message.answer(text='У вас нет ошибок! Круто!')
+async def show_mistakes_button(message: Message):
+    answer_text = show_mistakes(message.from_user.id)
+    await message.answer(text=answer_text)
 
 
+# Недописанная функция с получением сертификата
 @router.message(F.text.lower().in_(['получить сертификат']))
-async def get_certificate(message: Message, bot: Bot):
+async def get_certificate(message: Message):
     await message.answer('Сертификат')
 
 
+# Хэндлер на команду "/channel" и функция, отправляющая пользователю ссылку на канал
+# (ссылка указана в файле конфигурации (.env)
 @router.message(F.text.lower().in_(['/channel']))
-async def get_chanel(message: Message, bot: Bot):
-    await message.answer('https://t.me/PervueBelgorod')
+async def get_chanel(message: Message):
+    await message.answer(os.getenv('LINK'))
+
+
+# Хэндлер на команду "/help" и функция, выдающая основную информацию о боте и командах
+@router.message(F.text.lower().in_(['/help']))
+async def get_chanel(message: Message):
+    await message.answer(text='На прохождение теста даётся одна попытка, без возможности изменения результатов. '
+                              'После прохождения теста будет возможность посмотреть ошибки и скачать сертификат\n'
+                              '/start - это приветственное сообщение, описывающее предназначение бота\n'
+                              '/test - команда, для начала тестирования. Её также нужно нажать после подписки на канал '
+                              '(до прохождения теста)\n'
+                              '/help - Вы сейчас здесь 😊\n'
+                              '/channel - бот отправит ссылку на канал')
+
+
+# Хэндлер на остальные сообщения
+@router.message(F.text)
+async def else_messege(message: Message):
+    await message.answer('Извините, я не знаю такой команды :(\nПопробуйте "/start", "/test или /help')
