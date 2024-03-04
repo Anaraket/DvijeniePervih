@@ -188,6 +188,7 @@ async def tenth(message: Message, state: FSMContext):
     db.add_passed(1, message.from_user.id)
     await state.clear()
     # Ваш результат
+    db.add_result(answer=result(db.select_all_answers(message.from_user.id)), user_id=message.from_user.id)
     await message.answer(
         text=f'Поздравляю!\nВаш результат: {result(db.select_all_answers(message.from_user.id))}/10',
         reply_markup=result_kb)

@@ -92,6 +92,10 @@ class Database():
         self.cursor.execute(f'UPDATE users SET tenth_question = ? WHERE user_id = ?', (answer, user_id))
         self.connection.commit()
 
+    def add_result(self, answer, user_id):
+        self.cursor.execute(f'UPDATE users SET result = ? WHERE user_id = ?', (answer, user_id))
+        self.connection.commit()
+
     def select_all_answers(self, user_id):
         passed = self.cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
         return passed.fetchall()
