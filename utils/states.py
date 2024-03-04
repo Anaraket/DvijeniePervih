@@ -1,6 +1,7 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
+# Состояния бота
 class QuestionsState(StatesGroup):
     passed = State()
     fio = State()

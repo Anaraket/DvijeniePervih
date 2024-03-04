@@ -2,6 +2,7 @@ from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
 
+# menu в чате с ботом
 async def set_commands(bot: Bot):
     commands = [
         BotCommand(

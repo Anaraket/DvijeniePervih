@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import os
 
 from utils.commands import set_commands
-from handlers.start import router as router_start
 from handlers.test import router as router_test
 
 load_dotenv()
@@ -26,7 +25,7 @@ async def start_bot(bot: Bot):
 
 
 async def main():
-    dp.include_routers(router_start, router_test)
+    dp.include_router(router_test)
     await set_commands(bot)
     try:
         await bot.delete_webhook(drop_pending_updates=True)

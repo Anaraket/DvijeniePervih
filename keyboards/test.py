@@ -3,6 +3,7 @@ from utils.questions import questions
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
+# Генератор клавиатуры для 1-10 вопросов
 async def question(number):
     builder = ReplyKeyboardBuilder()
     for i in questions[number - 1]['answers']:
