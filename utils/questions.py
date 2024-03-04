@@ -1,52 +1,52 @@
 questions = [
     {
-        "question": "Was ist die Hauptstadt von Deutschland?",
-        "answers": ["Berlin", "München", "Hamburg", "Köln"],
-        "correct_answer": "Berlin"
+        "question": "Какая столица России?",
+        "answers": ["Москва", "Санкт-Петербург", "Казань", "Новосибирск"],
+        "correct_answer": "Москва"
     },
     {
-        "question": "Wie viele Bundesländer hat Deutschland?",
-        "answers": ["16", "10", "8", "12"],
-        "correct_answer": "16"
+        "question": "Какой город является столицей Франции?",
+        "answers": ["Париж", "Марсель", "Лион", "Тулуза"],
+        "correct_answer": "Париж"
     },
     {
-        "question": "Wer war der erste Bundeskanzler der Bundesrepublik Deutschland?",
-        "answers": ["Konrad Adenauer", "Ludwig Erhard", "Helmut Kohl", "Willy Brandt"],
-        "correct_answer": "Konrad Adenauer"
+        "question": "Какой город является столицей Великобритании?",
+        "answers": ["Лондон", "Манчестер", "Ливерпуль", "Бирмингем"],
+        "correct_answer": "Лондон"
     },
     {
-        "question": "In welchem Jahr fiel die Berliner Mauer?",
-        "answers": ["1989", "1990", "1987", "1991"],
-        "correct_answer": "1989"
+        "question": "Как называется самая большая планета Солнечной системы?",
+        "answers": ["Юпитер", "Марс", "Венера", "Земля"],
+        "correct_answer": "Юпитер"
     },
     {
-        "question": "Was ist das Wahrzeichen von Frankreich?",
-        "answers": ["Eiffelturm", "Big Ben", "Kreml", "Kölner Dom"],
-        "correct_answer": "Eiffelturm"
+        "question": "Какая река является самой длинной в мире?",
+        "answers": ["Амазонка", "Нил", "Миссисипи", "Янцзы"],
+        "correct_answer": "Амазонка"
     },
     {
-        "question": "Welches Land hat die meisten Einwohner?",
-        "answers": ["China", "Indien", "USA", "Russland"],
-        "correct_answer": "China"
+        "question": "Какой океан самый большой?",
+        "answers": ["Тихий", "Атлантический", "Индийский", "Северный Ледовитый"],
+        "correct_answer": "Тихий"
     },
     {
-        "question": "Wie heißt der längste Fluss der Welt?",
-        "answers": ["Nil", "Amazonas", "Jangtsekiang", "Mississippi"],
-        "correct_answer": "Nil"
+        "question": "Как называется самая высокая гора в мире?",
+        "answers": ["Эверест", "Килиманджаро", "Эльбрус", "МакКинли"],
+        "correct_answer": "Эверест"
     },
     {
-        "question": "Wer hat die Relativitätstheorie entwickelt?",
-        "answers": ["Albert Einstein", "Isaac Newton", "Galileo Galilei", "Stephen Hawking"],
-        "correct_answer": "Albert Einstein"
+        "question": "Какой остров является крупнейшим в мире?",
+        "answers": ["Гренландия", "Мадагаскар", "Борнео", "Калимантан"],
+        "correct_answer": "Гренландия"
     },
     {
-        "question": "Wie viele Planeten hat unser Sonnensystem?",
-        "answers": ["8", "9", "7", "10"],
-        "correct_answer": "8"
+        "question": "Как называется самое большое озеро в мире?",
+        "answers": ["Каспийское море", "Верхнее", "Виктория", "Байкал"],
+        "correct_answer": "Каспийское море"
     },
     {
-        "question": "Was ist die chemische Formel für Wasser?",
-        "answers": ["H2O", "CO2", "N2O", "O2"],
-        "correct_answer": "H2O"
+        "question": "Как называется столица Германии?",
+        "answers": ["Берлин", "Мюнхен", "Гамбург", "Франкфурт"],
+        "correct_answer": "Берлин"
     }
 ]

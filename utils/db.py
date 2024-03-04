@@ -40,6 +40,16 @@ class Database():
         self.cursor.close()
         self.connection.close()
 
+    def is_database_empty(self):
+        """
+        Проверяет, пуста ли база данных.
+        :return: True, если база данных пуста, и False в противном случае.
+        """
+        query = "SELECT COUNT(*) FROM users"
+        self.cursor.execute(query)
+        count = self.cursor.fetchone()[0]
+        return count == 0
+
     def select_passed(self, user_id):
         passed = self.cursor.execute("SELECT passed FROM users WHERE user_id = ?", (user_id,))
         return passed.fetchall()
@@ -100,3 +110,17 @@ class Database():
         passed = self.cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
         return passed.fetchall()
 
+    def select_columns(self, column_names: list, user_id: int):
+        """
+        Функция для выбора значений из нескольких столбцов таблицы users по user_id.
+        :param column_names: Список имен столбцов, значения которых нужно выбрать.
+        :param user_id: Значение user_id для фильтрации.
+        :return: Список значений из указанных столбцов для заданного user_id.
+        """
+        # Формируем строку запроса динамически
+        query = f"SELECT {', '.join(column_names)} FROM users WHERE user_id = ?"
+        # Выполняем запрос с переданным user_id
+        self.cursor.execute(query, (user_id,))
+        # Получаем результат запроса
+        result = self.cursor.fetchone()
+        return result

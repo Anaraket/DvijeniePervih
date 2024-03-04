@@ -46,10 +46,15 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
     user_channel_status = await bot.get_chat_member(chat_id=-1002004860176, user_id=message.from_user.id)
     if user_channel_status.status not in ['left', 'kicked']:
         db = Database(os.getenv('DATABASE_NAME'))
-        users, *rest = db.select_passed(message.from_user.id)[0]
-        db.add_passed(0, message.from_user.id)
-        if users == 1:
-            await message.answer('Вы уже проходили тест')
+        if not db.is_database_empty():
+            users, *rest = db.select_passed(message.from_user.id)[0]
+            db.add_passed(0, message.from_user.id)
+            if users == 1:
+                await message.answer('Вы уже проходили тест')
+            else:
+                db.add_user(message.from_user.id, user_channel_status.status, 0)
+                await message.answer('Желаете пройти тест?', reply_markup=kb)
+                await state.set_state(QuestionsState.passed)
         else:
             db.add_user(message.from_user.id, user_channel_status.status, 0)
             await message.answer('Желаете пройти тест?', reply_markup=kb)
@@ -85,7 +90,7 @@ async def correct_fio(message: Message, state: FSMContext):
 
 # Хэндлер на неправильно введённое имя
 @router.message(QuestionsState.fio)
-async def incorrect_fio(message: Message, state: FSMContext):
+async def incorrect_fio(message: Message):
     await message.answer('Введите ФИО (Иванов Иван Иванович - пример)')
 
 
