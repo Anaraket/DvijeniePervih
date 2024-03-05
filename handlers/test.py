@@ -37,7 +37,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
         try:
             # Пробуем узнать проходил ли пользователь тест
             users, *rest = db.select_passed(message.from_user.id)[0]
-            db.add_passed(0, message.from_user.id)
+            #db.add_passed(0, message.from_user.id)
             if users == 1:
                 # Если уже проходил
                 await message.answer('Вы уже проходили тест')

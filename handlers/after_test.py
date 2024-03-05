@@ -4,10 +4,11 @@ from aiogram import Router, F
 from aiogram.types import FSInputFile
 from aiogram.types import Message
 
+from utils.db import Database
 from utils.functions import show_mistakes
+from utils.sertificate_create import seftificate
 
 router = Router()
-cat = FSInputFile("C:/Users/user/PycharmProjects/DvijeniePervih/certificate.jpg")
 
 
 # Хэндлер, на кнопку "посмотреть ошибки" и функция отправки сообщения с ошибками
@@ -20,8 +21,12 @@ async def show_mistakes_button(message: Message):
 # Недописанная функция с получением сертификата
 @router.message(F.text.lower().in_(['получить сертификат']))
 async def get_certificate(message: Message):
-    await message.answer_photo(photo=cat,
-                               caption='Сертификат!')
+    db = Database(os.getenv('DATABASE_NAME'))
+    seftificate(fio=db.select_columns(column_names=['fio'], user_id=message.from_user.id),
+                result=db.select_columns(column_names=['result'], user_id=message.from_user.id))
+    cat = FSInputFile(path=
+                      f"C:/Users/user/PycharmProjects/DvijeniePervih/utils/upload/{(db.select_columns(['fio'], message.from_user.id))[0]}.pdf")
+    await message.answer_document(document=cat, caption='Сертификат!')
 
 
 # Хэндлер на команду "/channel" и функция, отправляющая пользователю ссылку на канал
