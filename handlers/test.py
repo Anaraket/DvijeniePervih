@@ -34,7 +34,6 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
     user_channel_status = await bot.get_chat_member(chat_id=(os.getenv('ID_CHANNEL')), user_id=message.from_user.id)
     if user_channel_status.status in ['member', 'creator', 'administrator']:
         db = Database(os.getenv('DATABASE_NAME'))
-        print(db.select_columns(request, message.from_user.id))
         try:
             # Пробуем узнать проходил ли пользователь тест
             users, *rest = db.select_passed(message.from_user.id)[0]
