@@ -5,6 +5,7 @@ from aiogram.fsm.state import StatesGroup, State
 class QuestionsState(StatesGroup):
     passed = State()
     fio = State()
+    age = State()
     first = State()
     second = State()
     third = State()

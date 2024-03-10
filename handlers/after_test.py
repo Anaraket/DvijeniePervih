@@ -1,12 +1,14 @@
 import os
 
 from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 from aiogram.types import Message
 
 from utils.db import Database
 from utils.functions import show_mistakes
 from utils.sertificate_create import seftificate
+from utils.states import QuestionsState
 
 router = Router()
 
@@ -32,8 +34,9 @@ async def get_certificate(message: Message):
 # Хэндлер на команду "/channel" и функция, отправляющая пользователю ссылку на канал
 # (ссылка указана в файле конфигурации (.env)
 @router.message(F.text.lower().in_(['/channel']))
-async def get_chanel(message: Message):
+async def get_chanel(message: Message, state: FSMContext):
     await message.answer(os.getenv('LINK'))
+    await state.set_state(QuestionsState.passed)
 
 
 # Хэндлер на команду "/help" и функция, выдающая основную информацию о боте и командах
