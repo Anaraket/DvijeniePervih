@@ -273,20 +273,16 @@ seven_to_eleven_classes = [questions_base[20:30]]
 #         print(number)
 
 
-def generate_quiz(questions_input, user_class: int, num_questions=10):
+def generate_quiz(questions_input, num_questions=10):
     """
     Генерирует случайные вопросы для викторины.
-
     Args:
     - questions (list): Список словарей с вопросами.
     - num_questions (int): Количество вопросов для выборки. По умолчанию 10.
-
     Returns:
     - list: Список словарей с выбранными вопросами.
     """
     return random.sample(questions_input, num_questions)
-
-
 # Пример использования функции для генерации вопросов
 # При вызове этой функции каждому пользователю будет сгенерирован свой список вопросов
-questions = generate_quiz(questions_base, , num_questions=10)
+questions = generate_quiz(questions_base, num_questions=10)
