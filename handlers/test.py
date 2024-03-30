@@ -1,11 +1,12 @@
 import os
 
-from aiogram import Router, Bot, F
+from aiogram import Router, Bot, F, Dispatcher
 from aiogram.filters import Command
 from aiogram.filters import StateFilter
 from aiogram.filters.chat_member_updated import \
     ChatMemberUpdatedFilter, MEMBER, KICKED, LEFT, RESTRICTED, ADMINISTRATOR, CREATOR
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.context import StorageKey
 from aiogram.types import Message, ChatMemberUpdated
 
 from keyboards.result import result_kb
@@ -16,6 +17,9 @@ from utils.functions import send_questions, result, request
 from utils.states import QuestionsState
 
 router = Router()
+
+
+# dp1 = Dispatcher()
 
 
 # Обработчик команды /start
@@ -34,7 +38,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
         try:
             # Пробуем узнать проходил ли пользователь тест
             users, *rest = db.select_passed(message.from_user.id)[0]
-            # db.add_passed(0, message.from_user.id)
+            db.add_passed(0, message.from_user.id)
             if users == 1:
                 # Если уже проходил
                 await message.answer('Вы уже проходили тест')
@@ -51,7 +55,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
     else:
         # Если пользователь не подписан на канал
         await message.answer(f'Для начала подпишись на наш канал: {os.getenv('LINK')}')
-        await state.set_state(QuestionsState.passed)
+        # await state.set_state(QuestionsState.passed)
 
 
 @router.chat_member(ChatMemberUpdatedFilter(
@@ -61,21 +65,62 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
     (ADMINISTRATOR | CREATOR | MEMBER)
 )
 )
-async def on_channel_join(event: ChatMemberUpdated):
+async def on_channel_join(event: ChatMemberUpdated, state: FSMContext, bot: Bot):
     if event.chat.id == int(os.getenv('ID_CHANNEL')):  # Проверяем, что это обновление от нужного канала
         await event.bot.send_message(chat_id=event.from_user.id,
                                      text="Поздравляю с подпиской!\nПриступим к прохождению теста?", reply_markup=kb)
+        dp = Dispatcher()
+        state: FSMContext = FSMContext(
+            storage=dp.storage,
+            key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
+        await state.update_data()
+        await state.set_state(QuestionsState.passed)
+
+
+# # Функция для проверки подписки пользователя в сообществе ВКонтакте
+# def is_user_subscribed(user_id):
+#     vk_session = vk_api.VkApi(token=os.getenv('VK_ACCESS_TOKEN'))
+#     vk = vk_session.get_api()
+#     try:
+#         response = vk.groups.isMember(group_id=os.getenv('VK_GROUP_ID'), user_id=user_id)
+#         return response['member'] == 1  # Возвращаем True, если пользователь подписан, иначе False
+#     except vk_api.exceptions.ApiError:
+#         return False  # Обработка возможной ошибки при запросе API
+
+# @router.chat_member(ChatMemberUpdatedFilter(
+#     member_status_changed=
+#     (KICKED | LEFT | RESTRICTED)
+#     >>
+#     (ADMINISTRATOR | CREATOR | MEMBER)
+# )
+# )
+# async def on_channel_join(event: ChatMemberUpdated):
+#     if event.chat.id == int(os.getenv('ID_CHANNEL')) and is_user_subscribed(event.from_user.id):  # Проверяем, что это обновление от нужного канала
+#         await event.bot.send_message(chat_id=event.from_user.id,
+#                                      text="Поздравляю с подпиской!\nПриступим к прохождению теста?", reply_markup=kb)
+
+# @router.chat_member(ChatMemberUpdatedFilter(
+#     member_status_changed=
+#     (KICKED | LEFT | RESTRICTED)
+#     >>
+#     (ADMINISTRATOR | CREATOR | MEMBER)
+# )
+# )
+# async def on_channel_join(event: ChatMemberUpdated):
+#     if event.chat.id == int(os.getenv('ID_CHANNEL')):  # Проверяем, что это обновление от нужного канала
+#         await event.bot.send_message(chat_id=event.from_user.id,
+#                                      text="Поздравляю с подпиской!\nПриступим к прохождению теста?", reply_markup=kb)
 
 
 # Хэндлер для начала самого теста (подтверждение от пользователя)
-@router.message(QuestionsState.passed, F.text.lower().in_(['да', 'хочу', 'желаю']))
+@router.message(QuestionsState.passed and F.text.lower().in_(['да', 'хочу', 'желаю']))
 async def pozitive_answer(message: Message, state: FSMContext):
     await message.answer(f"Замечательно!\nВведите ФИО:")
     await state.set_state(QuestionsState.fio)
 
 
 # Хэндлер на отмену теста
-@router.message(QuestionsState.passed, F.text.lower().in_(['нет', 'не хочу', 'в другой раз', 'неет']))
+@router.message(QuestionsState.passed and F.text.lower().in_(['нет', 'не хочу', 'в другой раз', 'неет']))
 async def negative_answer(message: Message, state: FSMContext):
     await message.answer(text='Очень жаль :(\nВы всегда сможете пройти тест, воспользовавшись командой "/test"')
     await state.clear()
@@ -86,15 +131,15 @@ async def negative_answer(message: Message, state: FSMContext):
 async def correct_fio(message: Message, state: FSMContext):
     db = Database(os.getenv('DATABASE_NAME'))
     db.add_fio(fio=message.text, user_id=message.from_user.id)
-    await message.answer('Класс! Теперь введите свой возраст:')
+    await message.answer('Молодец! В каком классе ты учишься:')
     await state.set_state(QuestionsState.age)
 
 
 # Бот реагирует только на правильно введённый возраст
-@router.message(QuestionsState.age, lambda message: message.text.isdigit() and 10 <= int(message.text) <= 50)
+@router.message(QuestionsState.age, lambda message: message.text.isdigit() and 1 <= int(message.text) <= 11)
 async def correct_age(message: Message, state: FSMContext):
     db = Database(os.getenv('DATABASE_NAME'))
-    db.add_age(age=int(message.text), user_id=message.from_user.id)
+    db.add_class(age=int(message.text), user_id=message.from_user.id)
     await message.answer('Здорово! Начнём тест')
     await message.answer(text=f'<u>1-й вопрос:</u>\n\n<b>{send_questions(1)}</b>', reply_markup=await question(1))
     await state.set_state(QuestionsState.first)
@@ -103,7 +148,7 @@ async def correct_age(message: Message, state: FSMContext):
 # Хэндлер на неправильно введённый возраст
 @router.message(QuestionsState.age)
 async def incorrect_age(message: Message):
-    await message.answer('Неверный возраст. Введите число от 10 до 50')
+    await message.answer('В каком классе ты учишься?. Введите число от 1 до 11')
 
 
 # Хэндлер на неправильно введённое имя

@@ -14,7 +14,7 @@ class Database():
                     status TEXT,
                     passed INTEGER,
                     fio TEXT,
-                    age INTEGER,
+                    class INTEGER,
                     first_question TEXT,
                     second_question TEXT,
                     third_question TEXT,
@@ -107,8 +107,8 @@ class Database():
         self.cursor.execute(f'UPDATE users SET result = ? WHERE user_id = ?', (answer, user_id))
         self.connection.commit()
 
-    def add_age(self, age: int, user_id):
-        self.cursor.execute(f'UPDATE users SET age = ? WHERE user_id = ?', (age, user_id))
+    def add_class(self, age: int, user_id):
+        self.cursor.execute(f'UPDATE users SET class = ? WHERE user_id = ?', (age, user_id))
         self.connection.commit()
 
     def select_columns(self, column_names: list[str], user_id: int):

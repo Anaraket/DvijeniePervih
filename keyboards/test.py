@@ -8,4 +8,4 @@ async def question(number):
     builder = ReplyKeyboardBuilder()
     for i in questions[number - 1]['answers']:
         builder.add(KeyboardButton(text=i))
-    return builder.adjust(2).as_markup(resize_keyboard=True)
+    return builder.adjust(1).as_markup(resize_keyboard=True)

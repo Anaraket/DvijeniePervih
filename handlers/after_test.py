@@ -8,7 +8,6 @@ from aiogram.types import Message
 from utils.db import Database
 from utils.functions import show_mistakes
 from utils.sertificate_create import seftificate
-from utils.states import QuestionsState
 
 router = Router()
 
@@ -36,12 +35,11 @@ async def get_certificate(message: Message):
 @router.message(F.text.lower().in_(['/channel']))
 async def get_chanel(message: Message, state: FSMContext):
     await message.answer(os.getenv('LINK'))
-    await state.set_state(QuestionsState.passed)
 
 
 # Хэндлер на команду "/help" и функция, выдающая основную информацию о боте и командах
 @router.message(F.text.lower().in_(['/help']))
-async def get_chanel(message: Message):
+async def get_help(message: Message):
     await message.answer(text='На прохождение теста даётся одна попытка, без возможности изменения результатов. '
                               'После прохождения теста будет возможность посмотреть ошибки и скачать сертификат\n'
                               '/start - это приветственное сообщение, описывающее предназначение бота\n'
@@ -53,5 +51,5 @@ async def get_chanel(message: Message):
 
 # Хэндлер на остальные сообщения
 @router.message(F.text)
-async def else_messege(message: Message):
+async def else_message(message: Message):
     await message.answer('Извините, я не знаю такой команды :(\nПопробуйте "/start", "/test или /help')

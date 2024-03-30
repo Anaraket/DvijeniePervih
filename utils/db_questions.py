@@ -1,6 +1,14 @@
-import random
-from utils.db import Database
+import sqlite3
 
+# Создание соединения с базой данных
+conn = sqlite3.connect('test_db.db')
+c = conn.cursor()
+
+# Создание таблицы questions
+c.execute('''CREATE TABLE IF NOT EXISTS questions
+             (number INTEGER PRIMARY KEY, question TEXT, answer1 TEXT, answer2 TEXT, answer3 TEXT, answer4 TEXT, correct_answer TEXT, category TEXT)''')
+
+# Вставка вопросов в таблицу с соответствующими категориями
 questions_base = [
     {
         'number': 1,
@@ -254,39 +262,14 @@ questions_base = [
     }
 ]
 
-four_classes = [questions_base[0:10]]
-five_and_six_classes = [questions_base[10:20]]
-seven_to_eleven_classes = [questions_base[20:30]]
+# Добавление вопросов в таблицу
+for question in questions_base:
+    c.execute(
+        "INSERT INTO questions VALUES (:number, :question, :answer1, :answer2, :answer3, :answer4, :correct_answer, :category)",
+        {'number': question['number'], 'question': question['question'], 'answer1': question['answers'][0],
+         'answer2': question['answers'][1], 'answer3': question['answers'][2], 'answer4': question['answers'][3],
+         'correct_answer': question['correct_answer'], 'category': question['category']})
 
-# child = [questions_base[0:11['number']]]
-# print(child)
-# tinager_young = [questions_base[11:21]]
-# tinager_old = [questions_base[21:]]
-
-# questions = {1: []}
-
-# def generate_quiz(user_id):
-#     db = Database(os.getenv('DATABASE_NAME'))
-#     age = db.select_columns(column_names=['age'], user_id=user_id)[0]
-#     if 10 <= age <= 12:
-#         number = random.choice(child) not in questions[user_id]
-#         print(number)
-
-
-def generate_quiz(questions_input, user_class: int, num_questions=10):
-    """
-    Генерирует случайные вопросы для викторины.
-
-    Args:
-    - questions (list): Список словарей с вопросами.
-    - num_questions (int): Количество вопросов для выборки. По умолчанию 10.
-
-    Returns:
-    - list: Список словарей с выбранными вопросами.
-    """
-    return random.sample(questions_input, num_questions)
-
-
-# Пример использования функции для генерации вопросов
-# При вызове этой функции каждому пользователю будет сгенерирован свой список вопросов
-questions = generate_quiz(questions_base, , num_questions=10)
+# Сохранение изменений и закрытие соединения
+conn.commit()
+conn.close()
