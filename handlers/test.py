@@ -1,4 +1,5 @@
 import os
+import random
 
 from aiogram import Router, Bot, F, Dispatcher
 from aiogram.filters import Command
@@ -56,7 +57,6 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
     else:
         # Если пользователь не подписан на канал
         await message.answer(f'Для начала подпишись на наш канал: {os.getenv('LINK')}')
-        # await state.set_state(QuestionsState.passed)
 
 
 @router.chat_member(ChatMemberUpdatedFilter(
@@ -141,7 +141,23 @@ async def correct_fio(message: Message, state: FSMContext):
 async def correct_age(message: Message, state: FSMContext):
     db = Database(os.getenv('DATABASE_NAME'))
     db.add_class(age=int(message.text), user_id=message.from_user.id)
+    if 1 <= int(message.text) <= 4:
+        await state.update_data(category=1)
+    elif 5 <= int(message.text) <= 6:
+        await state.update_data(category=2)
+    elif 7 <= int(message.text) <= 11:
+        await state.update_data(category=2)
+
+    # data = await state.get_data()
+    # print(data)
     await message.answer('Здорово! Начнём тест')
+    await state.update_data(numbers=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    data = (await state.get_data())['numbers']
+    random.shuffle(data)
+    print(data)
+    print(data.pop())
+    await state.update_data(numbers=data)
+    print((await state.get_data())['numbers'])
     await message.answer(text=f'<u>1-й вопрос:</u>\n\n<b>{send_questions(1)}</b>', reply_markup=await question(1))
     await state.set_state(QuestionsState.first)
 
