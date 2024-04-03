@@ -1,13 +1,13 @@
 import asyncio
-# import logging
-from aiogram import Bot, Dispatcher
-
-from dotenv import load_dotenv
 import os
 
-from utils.commands import set_commands
-from handlers.test import router as router_test
+import logging
+from aiogram import Bot, Dispatcher
+from dotenv import load_dotenv
+
 from handlers.after_test import router as router_after_test
+from handlers.test import router as router_test
+from utils.commands import set_commands
 
 load_dotenv()
 
@@ -17,11 +17,12 @@ admin_id = os.getenv('ADMIN_ID')
 bot = Bot(token=token, parse_mode='HTML')
 dp = Dispatcher()
 
-# logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO)
 
 
 @dp.startup()
-async def start_bot(bot: Bot):
+async def start_bot():
     await bot.send_message(chat_id=admin_id, text='Бот запущен!')
 
 
