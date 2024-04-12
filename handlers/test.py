@@ -2,6 +2,7 @@ import os
 import random
 
 from aiogram import Router, Bot, F, Dispatcher
+from aiogram.exceptions import TelegramForbiddenError
 from aiogram.filters import Command
 from aiogram.filters import StateFilter
 from aiogram.filters.chat_member_updated import \
@@ -22,7 +23,7 @@ router = Router()
 # Обработчик команды /start
 @router.message(Command(commands=['start']))
 async def command_start(message: Message):
-    await message.answer(text="👋 Привет! Это бот для прохождения теста🤖")
+    await message.answer(text="👋 Привет! Это бот для прохождения тестирования🤖")
 
 
 # Хэндлер для команды /test - запуск теста
@@ -35,7 +36,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
         try:
             # Пробуем узнать проходил ли пользователь тест
             user_passed = db.select_from_users_table(column_name='passed', user_id=message.from_user.id)
-            db.update_user_data('passed', 0, user_id=message.from_user.id)
+            # db.update_user_data('passed', 0, user_id=message.from_user.id)
             if user_passed == 1:
                 # Если уже проходил
                 await message.answer('Вы уже проходили тест☺️')
@@ -52,7 +53,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
             await state.set_state(QuestionsState.passed)
     else:
         # Если пользователь не подписан на канал
-        await message.answer(f'Для начала подпишись на наш канал ☺️: {os.getenv('LINK')}')
+        await message.answer(f'Для начала подпишитесь на наш канал ☺️: {os.getenv('LINK')}')
 
 
 @router.chat_member(
@@ -60,21 +61,31 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
                             )
 )
 async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
-    if event.chat.id == int(os.getenv('ID_CHANNEL')):  # Проверяем, что это обновление от нужного канала
-        await event.bot.send_message(chat_id=event.from_user.id,
-                                     text="Поздравляю с подпиской!🎉\nПриступим к прохождению теста?", reply_markup=kb)
-        dp = Dispatcher()
-        state: FSMContext = FSMContext(
-            storage=dp.storage,
-            key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
-        await state.update_data()
-        await state.set_state(QuestionsState.passed)
+    # Проверяем, что это обновление от нужного канала
+    if event.chat.id == int(os.getenv('ID_CHANNEL')):
+        try:
+            await event.bot.send_message(chat_id=event.from_user.id,
+                                         text="Поздравляю с подпиской!🎉\nПриступим к прохождению теста?",
+                                         reply_markup=kb)
+            db = Database(os.getenv('DATABASE_NAME'))
+            db.add_user(event.from_user.id, event.new_chat_member.status, 0)
+            dp = Dispatcher()
+            state: FSMContext = FSMContext(
+                storage=dp.storage,
+                key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
+            await state.update_data()
+            await state.set_state(QuestionsState.passed)
+        except TelegramForbiddenError as e:
+            print(f"Ошибка: бот был заблокирован пользователем. {e}")
+        except Exception as e:
+            print(f"Ошибка: {e}")
 
 
 # Хэндлер для начала самого теста (подтверждение от пользователя)
 @router.message(QuestionsState.passed and F.text.lower().in_(['да', 'хочу', 'желаю']))
 async def positive_answer(message: Message, state: FSMContext):
-    await message.answer(f"Замечательно! Введите ФИО:")
+    await message.answer(f"Замечательно! Введите ФИО: \n"
+                         f"(тестирование можно пройти только один раз, поэтому внимательно вводите свои данные❗️)")
     await state.set_state(QuestionsState.fio)
 
 
@@ -96,7 +107,7 @@ async def correct_fio(message: Message, state: FSMContext):
 
 # Бот реагирует только на правильно введённый возраст
 @router.message(QuestionsState.age, lambda message: message.text.isdigit() and 1 <= int(message.text) <= 11)
-async def correct_age(message: Message, state: FSMContext):
+async def correct_class(message: Message, state: FSMContext):
     db = Database(os.getenv('DATABASE_NAME'))
     db.update_user_data(column_name='class', value=int(message.text), user_id=message.from_user.id)
     if 1 <= int(message.text) <= 4:
@@ -120,13 +131,13 @@ async def correct_age(message: Message, state: FSMContext):
     await state.set_state(QuestionsState.first)
 
 
-# Хэндлер на неправильно введённый возраст
+# Хэндлер на неправильно введённый класс
 @router.message(QuestionsState.age)
-async def incorrect_age(message: Message):
-    await message.answer('В каком классе ты учишься?. Введите число от 1 до 11')
+async def incorrect_class(message: Message):
+    await message.answer('В каком классе Вы учитесь? Введите число от 1 до 11')
 
 
-# Хэндлер на неправильно введённое имя
+# Хэндлер на неправильно введённое ФИО
 @router.message(QuestionsState.fio)
 async def incorrect_fio(message: Message):
     await message.answer('Введите ФИО (Иванов Иван Иванович - пример)')
@@ -141,7 +152,6 @@ async def first(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -154,7 +164,7 @@ async def first(message: Message, state: FSMContext):
     await state.set_state(QuestionsState.second)
 
 
-# # Переход в состояние второго вопроса
+# Переход в состояние второго вопроса
 @router.message(QuestionsState.second)
 async def second(message: Message, state: FSMContext):
     # save_second()
@@ -163,7 +173,6 @@ async def second(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -185,7 +194,6 @@ async def third(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -207,7 +215,6 @@ async def fourth(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -229,7 +236,6 @@ async def fifth(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -251,7 +257,6 @@ async def sixth(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -273,7 +278,6 @@ async def seventh(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -295,7 +299,6 @@ async def eighth(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
@@ -317,7 +320,6 @@ async def ninth(message: Message, state: FSMContext):
     data = (await state.get_data())
     category = data['category']
     numbers = data['numbers']
-    # random.shuffle(data)
     number_of_question = numbers.pop()
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
