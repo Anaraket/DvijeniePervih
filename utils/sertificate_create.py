@@ -16,12 +16,12 @@ def certificate(fio, result):
     result = result[0]
     width_name = txt.measure(fio)  # Длина ФИО в пикселях
     width_result = txt.measure(str(result))  # Длина результата в пикселях
-    im = Image.open("./test.jpg")  # Открываем изображение
+    im = Image.open("/root/bots/DvijeniePervih/utils/test.jpg")  # Открываем изображение
     font_fio = ImageFont.truetype(
-        font="./fonts/Pragmatica/Pragmatica-Black.ttf",
+        font="/root/bots/DvijeniePervih/utils/fonts/Pragmatica/Pragmatica-Black.ttf",
         size=55)  # Шрифт для ФИО
     font_result = ImageFont.truetype(
-        font="./fonts/Pragmatica/Pragmatica-Black.ttf",
+        font="/root/bots/DvijeniePervih/utils/fonts/Pragmatica/Pragmatica-Black.ttf",
         size=45)  # Шрифт для результата
     draw_text = ImageDraw.Draw(im)
     # Пишем ФИО. ХУ - находим середину поля ввода и середину ФИО и вычисляем как написать ФИО по центру поля ввода
@@ -34,6 +34,6 @@ def certificate(fio, result):
                    fill='#000000')
     # Пробуем сохранить изменённую фотографию в формате pdf
     try:
-        im.save(f'./upload/{fio}.pdf')
+        im.save(f'/root/bots/DvijeniePervih/utils/upload/{fio}.pdf')
     except OSError as e:
         print(f"Ошибка при сохранении файла: {e}")

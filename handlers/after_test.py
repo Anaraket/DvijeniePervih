@@ -19,7 +19,7 @@ async def get_certificate(message: Message):
         certificate(fio=db.select_columns_from_users_table(column_names=['fio'], user_id=message.from_user.id),
                     result=db.select_columns_from_users_table(column_names=['result'], user_id=message.from_user.id))
         cat = FSInputFile(
-            path=f"../utils/upload/{(db.select_columns_from_users_table(['fio'], message.from_user.id))[0]}.pdf")
+            path=f"/root/bots/DvijeniePervih/utils/upload/{(db.select_columns_from_users_table(['fio'], message.from_user.id))[0]}.pdf")
         await message.answer_document(document=cat,
                                       caption='Поздравляю! Ваш заслуженный сертификат о прохождении завершающего'
                                               ' тестирования!')
