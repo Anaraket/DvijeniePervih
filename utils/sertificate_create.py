@@ -1,12 +1,12 @@
 import tkinter
-from tkinter import font as tkFont
+from tkinter import font
 
 from PIL import Image, ImageDraw, ImageFont
 
 
 def certificate(fio, result):
     tkinter.Frame().destroy()
-    txt = tkFont.Font(family="Pragmatica", size=55)
+    txt = font.Font(family="Pragmatica", size=55)
     # Значения в пикселях начала "поля ввода" для ФИО, результата и конца.
     name_start = (136, 780)
     name_end = (1308, 780)

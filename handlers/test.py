@@ -124,8 +124,7 @@ async def correct_class(message: Message, state: FSMContext):
     random.shuffle(numbers)
     number_of_question = numbers.pop()
     await message.answer(
-        text=f'<u>1-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>1-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers, used_numbers=[number_of_question])
     await state.set_state(QuestionsState.first)
@@ -156,8 +155,7 @@ async def first(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>2-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>2-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -177,8 +175,7 @@ async def second(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>3-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>3-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -198,8 +195,7 @@ async def third(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>4-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>4-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -219,8 +215,7 @@ async def fourth(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>5-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>5-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -240,8 +235,7 @@ async def fifth(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>6-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>6-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -261,8 +255,7 @@ async def sixth(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>7-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>7-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -282,8 +275,7 @@ async def seventh(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>8-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>8-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -303,8 +295,7 @@ async def eighth(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>9-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                        category=category)}</b>',
+        text=f'<u>9-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
@@ -324,8 +315,7 @@ async def ninth(message: Message, state: FSMContext):
     used_numbers = data['used_numbers']
     used_numbers.append(number_of_question)
     await message.answer(
-        text=f'<u>10-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question,
-                                                         category=category)}</b>',
+        text=f'<u>10-й вопрос:</u>\n\n<b>{send_questions(number=number_of_question, category=category)}</b>',
         reply_markup=await question(number_of_question, category=category))
     await state.update_data(numbers=numbers,
                             used_numbers=used_numbers)
