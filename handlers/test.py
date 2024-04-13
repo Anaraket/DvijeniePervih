@@ -53,7 +53,7 @@ async def check_subscription(message: Message, bot: Bot, state: FSMContext):
             await state.set_state(QuestionsState.passed)
     else:
         # Если пользователь не подписан на канал
-        await message.answer(f'Для начала подпишитесь на наш канал ☺️: {os.getenv('LINK')}')
+        await message.answer(f'Для начала подпишитесь на наш канал ☺️: {os.getenv("LINK")}')
 
 
 @router.chat_member(
