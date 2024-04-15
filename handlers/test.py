@@ -86,7 +86,7 @@ async def positive_answer(message: Message, state: FSMContext):
 # Хэндлер на отмену теста
 @router.message(QuestionsState.passed and F.text.lower().in_(['нет', 'не хочу', 'в другой раз']))
 async def negative_answer(message: Message, state: FSMContext):
-    await message.answer(text='Очень жаль 😔\nВы всегда сможете пройти тест, воспользовавшись командой "/test"')
+    await message.answer(text='Очень жаль 😔\nВы всегда сможете пройти тест, воспользовавшись командой "/start"')
     await state.clear()
 
 
