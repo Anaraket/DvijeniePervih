@@ -21,14 +21,8 @@ router = Router()
 
 
 # Обработчик команды /start
-@router.message(Command(commands=['start']))
-async def command_start(message: Message):
-    await message.answer(text="👋 Привет! Это бот для прохождения тестирования🤖")
-
-
-# Хэндлер для команды /test - запуск теста
-@router.message(F.text.lower().in_(['/test', 'пройти тест', 'тест']), StateFilter(None))
-async def check_subscription(message: Message, bot: Bot, state: FSMContext):
+@router.message(Command(commands=['start']), StateFilter(None))
+async def start_test(message: Message, bot: Bot, state: FSMContext):
     # Проверка, что пользователь подписан на канал
     user_channel_status = await bot.get_chat_member(chat_id=(os.getenv('ID_CHANNEL')), user_id=message.from_user.id)
     if user_channel_status.status in ['member', 'creator', 'administrator']:
