@@ -30,7 +30,7 @@ async def start_test(message: Message, bot: Bot, state: FSMContext):
         try:
             # Пробуем узнать проходил ли пользователь тест
             user_passed = db.select_from_users_table(column_name='passed', user_id=message.from_user.id)
-            # db.update_user_data('passed', 0, user_id=message.from_user.id)
+            db.update_user_data('passed', 0, user_id=message.from_user.id)
             if user_passed == 1:
                 # Если уже проходил
                 await message.answer('Вы уже проходили тест☺️')
