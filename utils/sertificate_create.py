@@ -8,10 +8,10 @@ def certificate(fio, result):
     tkinter.Frame().destroy()
     txt = font.Font(family="Pragmatica", size=55)
     # Значения в пикселях начала "поля ввода" для ФИО, результата и конца.
-    name_start = (136, 780)
-    name_end = (1308, 780)
-    result_start = (1000, 1040)
-    result_end = (1070, 1040)
+    name_start = (100, 933)
+    name_end = (1554, 933)
+    result_start = (1169, 1251)
+    result_end = (1257, 1251)
     fio = fio[0]
     result = result[0]
     width_name = txt.measure(fio)  # Длина ФИО в пикселях
@@ -25,11 +25,11 @@ def certificate(fio, result):
         size=45)  # Шрифт для результата
     draw_text = ImageDraw.Draw(im)
     # Пишем ФИО. ХУ - находим середину поля ввода и середину ФИО и вычисляем как написать ФИО по центру поля ввода
-    draw_text.text(((((name_start[0] + name_end[0]) / 2) - width_name / 2) + 165, 780 - 8), text=str(fio),
+    draw_text.text(((((name_start[0] + name_end[0]) / 2) - width_name / 2) + 165, 730 - 8), text=str(fio),
                    font=font_fio,
                    fill='#000000', align="center")
     # Пишем результат, тем же самым образом ищем центр
-    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 45, 1130 - 40), text=f'{str(result)}',
+    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 15, 1030 - 40), text=f'{str(result)}',
                    font=font_result,
                    fill='#000000')
     # Пробуем сохранить изменённую фотографию в формате pdf
