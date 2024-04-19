@@ -29,7 +29,7 @@ def certificate(fio, result):
                    font=font_fio,
                    fill='#000000', align="center")
     # Пишем результат, тем же самым образом ищем центр
-    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 14, 1200), text=f'{str(result)}',
+    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 14, 1195), text=f'{str(result)}',
                    font=font_result,
                    fill='#000000')
     # Пробуем сохранить изменённую фотографию в формате pdf
