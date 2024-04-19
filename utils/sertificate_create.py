@@ -25,11 +25,11 @@ def certificate(fio, result):
         size=60)  # Шрифт для результата
     draw_text = ImageDraw.Draw(im)
     # Пишем ФИО. ХУ - находим середину поля ввода и середину ФИО и вычисляем как написать ФИО по центру поля ввода
-    draw_text.text(((((name_start[0] + name_end[0]) / 2) - width_name / 2) + 142, 730 + 135), text=str(fio),
+    draw_text.text(((((name_start[0] + name_end[0]) / 2) - width_name / 2) + 137, 730 + 135), text=str(fio),
                    font=font_fio,
                    fill='#000000', align="center")
     # Пишем результат, тем же самым образом ищем центр
-    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 12, 1180), text=f'{str(result)}',
+    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 10, 1180), text=f'{str(result)}',
                    font=font_result,
                    fill='#000000')
     # Пробуем сохранить изменённую фотографию в формате pdf
