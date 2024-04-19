@@ -19,7 +19,7 @@ def certificate(fio, result):
     im = Image.open("/root/bots/DvijeniePervih/utils/test.jpg")  # Открываем изображение
     font_fio = ImageFont.truetype(
         font="/root/bots/DvijeniePervih/utils/fonts/Pragmatica/Pragmatica-Black.ttf",
-        size=55)  # Шрифт для ФИО
+        size=60)  # Шрифт для ФИО
     font_result = ImageFont.truetype(
         font="/root/bots/DvijeniePervih/utils/fonts/Pragmatica/Pragmatica-Black.ttf",
         size=60)  # Шрифт для результата
@@ -29,7 +29,7 @@ def certificate(fio, result):
                    font=font_fio,
                    fill='#000000', align="center")
     # Пишем результат, тем же самым образом ищем центр
-    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 14, 1190), text=f'{str(result)}',
+    draw_text.text(((((result_start[0] + result_end[0]) / 2) - width_result / 2) + 12, 1180), text=f'{str(result)}',
                    font=font_result,
                    fill='#000000')
     # Пробуем сохранить изменённую фотографию в формате pdf
