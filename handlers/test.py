@@ -89,9 +89,9 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
             await event.bot.send_message(chat_id=event.from_user.id,
                                          text="Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
             print(await state.get_state())
-            await state.update_data()
+            # await state.update_data()
             print(await state.get_state())
-            await state.set_state(QuestionsState.wait)
+            # await state.set_state(QuestionsState.wait)
             print(await state.get_state())
         except TelegramForbiddenError as e:
             print(f"Ошибка: бот был заблокирован пользователем. {e}")
