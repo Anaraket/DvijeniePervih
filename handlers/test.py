@@ -82,7 +82,7 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
     if event.chat.id == int(os.getenv('ID_CHANNEL')):
         try:
             await event.bot.send_message(chat_id=event.from_user.id,
-                                         text="Пожалуйста, подпишитесь на канал для продолжения теста")
+                                         text="Пожалуйста, подпишитесь на канал для продолжения теста: ")
             db = Database(os.getenv('DATABASE_NAME'))
             db.add_user(event.from_user.id, event.new_chat_member.status, 0)
             dp = Dispatcher()

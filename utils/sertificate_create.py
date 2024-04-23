@@ -22,7 +22,7 @@ def certificate(fio, result):
         size=60)  # Шрифт для ФИО
     font_result = ImageFont.truetype(
         font="/root/bots/DvijeniePervih/utils/fonts/Pragmatica/Pragmatica-Black.ttf",
-        size=70)  # Шрифт для результата
+        size=65)  # Шрифт для результата
     draw_text = ImageDraw.Draw(im)
     # Пишем ФИО. ХУ - находим середину поля ввода и середину ФИО и вычисляем как написать ФИО по центру поля ввода
     draw_text.text(((((name_start[0] + name_end[0]) / 2) - width_name / 2) + 110, 730 + 135), text=str(fio),
