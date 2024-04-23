@@ -92,7 +92,7 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
                 key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
             await state.update_data()
             await state.clear()
-            print(state.get_state())
+            print(await state.get_state())
         except TelegramForbiddenError as e:
             print(f"Ошибка: бот был заблокирован пользователем. {e}")
         except Exception as e:
