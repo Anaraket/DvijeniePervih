@@ -81,15 +81,15 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
 )
 async def channel_left(event: ChatMemberUpdated, bot: Bot):
     if event.chat.id == int(os.getenv('ID_CHANNEL')):
+        db = Database(os.getenv('DATABASE_NAME'))
+        db.add_user(event.from_user.id, event.new_chat_member.status, 0)
+        dp = Dispatcher()
+        state: FSMContext = FSMContext(
+            storage=dp.storage,
+            key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
         try:
             await event.bot.send_message(chat_id=event.from_user.id,
                                          text="Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
-            db = Database(os.getenv('DATABASE_NAME'))
-            db.add_user(event.from_user.id, event.new_chat_member.status, 0)
-            dp = Dispatcher()
-            state: FSMContext = FSMContext(
-                storage=dp.storage,
-                key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
             print(await state.get_state())
             await state.update_data()
             print(await state.get_state())
