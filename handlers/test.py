@@ -90,7 +90,9 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
             state: FSMContext = FSMContext(
                 storage=dp.storage,
                 key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
+            print(await state.get_state())
             await state.update_data()
+            print(await state.get_state())
             await state.clear()
             print(await state.get_state())
         except TelegramForbiddenError as e:
