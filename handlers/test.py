@@ -37,13 +37,13 @@ async def start_test(message: Message, bot: Bot, state: FSMContext):
             else:
                 # Если ещё не проходил тест
                 db.add_user(user_id=message.from_user.id, status=user_channel_status.status, passed=0)
-                await message.answer('Желаете пройти тест?', reply_markup=kb)
+                await message.answer("Приступим к прохождению теста!")
                 await state.set_state(QuestionsState.passed)
         except Exception as e:
             print(f"Произошла ошибка: {e}")
             # Если не получилось достать значение passed (Если пользователя ещё нет в БД)
             db.add_user(message.from_user.id, user_channel_status.status, 0)
-            await message.answer('Желаете пройти тест?', reply_markup=kb)
+            await message.answer('Приступим к прохождению теста')
             await state.set_state(QuestionsState.passed)
     else:
         # Если пользователь не подписан на канал
@@ -59,8 +59,7 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
     if event.chat.id == int(os.getenv('ID_CHANNEL')):
         try:
             await event.bot.send_message(chat_id=event.from_user.id,
-                                         text="Поздравляю с подпиской!🎉\nПриступим к прохождению теста?",
-                                         reply_markup=kb)
+                                         text="Поздравляю с подпиской!🎉\nПриступим к прохождению теста")
             db = Database(os.getenv('DATABASE_NAME'))
             db.add_user(event.from_user.id, event.new_chat_member.status, 0)
             dp = Dispatcher()
@@ -75,19 +74,34 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
             print(f"Ошибка: {e}")
 
 
+@router.chat_member(
+    ChatMemberUpdatedFilter(member_status_changed=(ADMINISTRATOR | CREATOR | MEMBER) >> (KICKED | LEFT | RESTRICTED)
+                            )
+)
+async def channel_left(event: ChatMemberUpdated, bot: Bot):
+    if event.chat.id == int(os.getenv('ID_CHANNEL')):
+        try:
+            await event.bot.send_message(chat_id=event.from_user.id,
+                                         text="Пожалуйста, подпишитесь на канал для продолжения теста")
+            db = Database(os.getenv('DATABASE_NAME'))
+            db.add_user(event.from_user.id, event.new_chat_member.status, 0)
+            dp = Dispatcher()
+            state: FSMContext = FSMContext(
+                storage=dp.storage,
+                key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
+            await state.clear()
+        except TelegramForbiddenError as e:
+            print(f"Ошибка: бот был заблокирован пользователем. {e}")
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+
 # Хэндлер для начала самого теста (подтверждение от пользователя)
-@router.message(QuestionsState.passed and F.text.lower().in_(['да', 'хочу', 'желаю']))
+@router.message(QuestionsState.passed)
 async def positive_answer(message: Message, state: FSMContext):
-    await message.answer(f"Замечательно! Введите ФИО: \n"
+    await message.answer(f"Введите ФИО: \n"
                          f"(тестирование можно пройти только один раз, поэтому внимательно вводите свои данные❗️)")
     await state.set_state(QuestionsState.fio)
-
-
-# Хэндлер на отмену теста
-@router.message(QuestionsState.passed and F.text.lower().in_(['нет', 'не хочу', 'в другой раз']))
-async def negative_answer(message: Message, state: FSMContext):
-    await message.answer(text='Очень жаль 😔\nВы всегда сможете пройти тест, воспользовавшись командой /start')
-    await state.clear()
 
 
 # Переход в состояние ввода ФИО. Реагирует только на корректно введённое ФИО
