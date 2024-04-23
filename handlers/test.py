@@ -100,11 +100,10 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
 
 
 # Хэндлер для начала самого теста (подтверждение от пользователя)
-@router.message(QuestionsState.wait and F.text)
+@router.message(QuestionsState.wait, F.text)
 async def wait(message: Message, state: FSMContext):
     print(await state.get_state())
-    await message.answer(f"Замечательно! Введите ФИО: \n"
-                         f"Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
+    await message.answer(f"Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
     await state.set_state(QuestionsState.fio)
 
 
