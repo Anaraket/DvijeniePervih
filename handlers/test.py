@@ -81,8 +81,6 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
 )
 async def channel_left(event: ChatMemberUpdated, bot: Bot):
     if event.chat.id == int(os.getenv('ID_CHANNEL')):
-        db = Database(os.getenv('DATABASE_NAME'))
-        db.add_user(event.from_user.id, event.new_chat_member.status, 0)
         dp = Dispatcher()
         state: FSMContext = FSMContext(
             storage=dp.storage,
@@ -93,12 +91,21 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
             print(await state.get_state())
             await state.update_data()
             print(await state.get_state())
-            await state.clear()
+            await state.set_state(QuestionsState.wait)
             print(await state.get_state())
         except TelegramForbiddenError as e:
             print(f"Ошибка: бот был заблокирован пользователем. {e}")
         except Exception as e:
             print(f"Ошибка: {e}")
+
+
+# Хэндлер для начала самого теста (подтверждение от пользователя)
+@router.message(QuestionsState.wait and F.text)
+async def wait(message: Message, state: FSMContext):
+    print(await state.get_state())
+    await message.answer(f"Замечательно! Введите ФИО: \n"
+                         f"Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
+    await state.set_state(QuestionsState.fio)
 
 
 # Хэндлер для начала самого теста (подтверждение от пользователя)
