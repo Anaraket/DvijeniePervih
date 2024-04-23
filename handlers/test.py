@@ -84,14 +84,17 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
         try:
             await event.bot.send_message(chat_id=event.from_user.id,
                                          text="Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
-            db = Database(os.getenv('DATABASE_NAME'))
-            db.add_user(event.from_user.id, event.new_chat_member.status, 0)
             dp = Dispatcher()
             state: FSMContext = FSMContext(
                 storage=dp.storage,
                 key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
-            await state.update_data()
-            await state.clear()
+            try:
+                await state.clear()
+            except:
+                print("Ошибка")
+
+            db = Database(os.getenv('DATABASE_NAME'))
+            db.add_user(event.from_user.id, event.new_chat_member.status, 0)
         except TelegramForbiddenError as e:
             print(f"Ошибка: бот был заблокирован пользователем. {e}")
         except Exception as e:
