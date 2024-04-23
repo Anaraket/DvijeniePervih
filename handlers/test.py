@@ -104,6 +104,7 @@ async def channel_left(event: ChatMemberUpdated, bot: Bot):
 # Хэндлер для начала самого теста (подтверждение от пользователя)
 @router.message(QuestionsState.passed and F.text.lower().in_(['да', 'хочу', 'желаю']))
 async def positive_answer(message: Message, state: FSMContext):
+    print(await state.get_state())
     await message.answer(f"Замечательно! Введите ФИО: \n"
                          f"(тестирование можно пройти только один раз, поэтому внимательно вводите свои данные❗️)")
     await state.set_state(QuestionsState.fio)
