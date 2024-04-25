@@ -75,42 +75,9 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
             print(f"Ошибка: {e}")
 
 
-# @router.chat_member(
-#     ChatMemberUpdatedFilter(member_status_changed=(ADMINISTRATOR | CREATOR | MEMBER) >> (KICKED | LEFT | RESTRICTED)
-#                             )
-# )
-# async def channel_left(event: ChatMemberUpdated, bot: Bot):
-#     if event.chat.id == int(os.getenv('ID_CHANNEL')):
-#         dp = Dispatcher()
-#         state: FSMContext = FSMContext(
-#             storage=dp.storage,
-#             key=StorageKey(chat_id=event.from_user.id, user_id=event.from_user.id, bot_id=bot.id))
-#         try:
-#             await event.bot.send_message(chat_id=event.from_user.id,
-#                                          text="Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
-#             print(await state.get_state())
-#             # await state.update_data()
-#             print(await state.get_state())
-#             # await state.set_state(QuestionsState.wait)
-#             print(await state.get_state())
-#         except TelegramForbiddenError as e:
-#             print(f"Ошибка: бот был заблокирован пользователем. {e}")
-#         except Exception as e:
-#             print(f"Ошибка: {e}")
-#
-#
-# # Хэндлер для начала самого теста (подтверждение от пользователя)
-# @router.message(F.text and QuestionsState.wait)
-# async def wait(message: Message, state: FSMContext):
-#     print(await state.get_state())
-#     await message.answer(f"Для продолжения тестирования, пожалуйста, подпишитесь на наш канал: https://t.me/mypervie31")
-#     await state.set_state(QuestionsState.fio)
-
-
 # Хэндлер для начала самого теста (подтверждение от пользователя)
 @router.message(QuestionsState.passed and F.text.lower().in_(['да', 'хочу', 'желаю']))
 async def positive_answer(message: Message, state: FSMContext):
-    print(await state.get_state())
     await message.answer(f"Замечательно! Введите ФИО: \n"
                          f"(тестирование можно пройти только один раз, поэтому внимательно вводите свои данные❗️)")
     await state.set_state(QuestionsState.fio)

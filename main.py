@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from handlers.after_test import router as router_after_test
 from handlers.test import router as router_test
 from utils.commands import set_commands
+from utils.middleware import ChannelSubscriptionMiddleware
 
 load_dotenv()
 
@@ -28,6 +29,8 @@ async def start_bot():
 
 async def main():
     dp.include_routers(router_test, router_after_test)
+    dp.message.middleware(ChannelSubscriptionMiddleware())
+
     await set_commands(bot)
     try:
         await bot.delete_webhook(drop_pending_updates=True)
