@@ -84,7 +84,7 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
 # Хэндлер для начала самого теста (подтверждение от пользователя)
 @router.message(QuestionsState.passed and F.text.lower().in_(['да', 'хочу', 'желаю']))
 async def positive_answer(message: Message, state: FSMContext):
-    await message.answer(f"Замечательно! Введите ФИО: \n"
+    await message.answer(f"Замечательно! Введите ФИО (в полном виде): \n"
                          f"(тестирование можно пройти только один раз, поэтому внимательно вводите свои данные❗️)")
     await state.set_state(QuestionsState.fio)
 
