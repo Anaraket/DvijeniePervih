@@ -76,7 +76,7 @@ async def on_channel_join(event: ChatMemberUpdated, bot: Bot):
                 await state.update_data()
                 await state.set_state(QuestionsState.passed)
             except TelegramForbiddenError as e:
-                print(f"Ошибка: бот был заблокирован пользователем. {e}")
+                print(f"Ошибка: {event.from_user.username} подписался на канал, но не писал боту. {e}")
             except Exception as e:
                 print(f"Ошибка: {e}")
 
